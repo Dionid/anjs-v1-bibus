@@ -29,5 +29,5 @@ import {createConnection} from "typeorm";
     logging: true,
   })
 
-  await app.listen(config.http.port);
+  await app.listen(config.http.port, "0.0.0.0");
 })();

@@ -8,7 +8,8 @@
     "lint:check": "yarn eslint --max-warnings 0 --format stylish \"!(node_modules)/**/*.ts{,x}\"",
     "lint:write": "yarn lint:check --fix",
     "prepare": "husky install",
-    "start": "cd main-back && yarn install && yarn dev:mvc"
+    "prestart": "cd main-back && yarn install && npm run build",
+    "start": "cd main-back && NODE_PATH=./build node build/index.js"
   },
   "lint-staged": {
     "**/*.{ts,tsx}": [
