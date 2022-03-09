@@ -127,4 +127,27 @@ export class User extends BaseEntity {
       this.role = newUserData.role
     }
   }
+
+  async changeRole(newRole: UserRole, whoEditing: User) {
+    // . Update role
+    if (newRole !== this.role) {
+      if (whoEditing.role !== UserRole.ADMIN) {
+        throw new Error(`Permission denied`)
+      }
+
+      if (newRole !== UserRole.ADMIN && newRole !== UserRole.USER) {
+        throw new Error(`Inappropriate role`)
+      }
+
+      this.role = newRole
+    }
+  }
+
+  async changeEmail(newEmail: string) {
+    this.mainEmail().setNotMain()
+
+    const newUserEmail = await UserEmail.createByUser(newEmail, this)
+
+    this.emails.push(newUserEmail)
+  }
 }

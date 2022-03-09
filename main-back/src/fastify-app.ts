@@ -1,22 +1,18 @@
-import {config} from "config";
-import {AuthController} from "controllers/auth";
-import {
-  AuthLoginBodySchema,
-  AuthLoginResponsesSchema, AuthLogoutResponsesSchema,
-  AuthRegisterBodySchema,
-  AuthRegisterResponsesSchema, AuthRequestTokenBodySchema, AuthRequestTokenResponsesSchema
-} from "controllers/auth.req-res";
-import {UserController} from "controllers/user";
-import {UserGetOneParamsSchema, UserUpdateBodySchema} from "controllers/user.req-res";
-import {emailSender} from "email-sender";
+import { config } from "config";
+import { UserController } from "controllers/user";
+import { UserGetOneParamsSchema, UserUpdateBodySchema } from "controllers/user.req-res";
 import Fastify, { FastifyInstance } from "fastify";
 import fastifySwagger from "fastify-swagger";
-import {FromSchema} from "json-schema-to-ts";
-import {User} from "models/user";
-import {JWTToken} from "utils/jwt-tokens";
-import {v4} from "uuid";
+import { FromSchema } from "json-schema-to-ts";
+import { User } from "models/user";
+import { JWTToken } from "utils/jwt-tokens";
+import { v4 } from "uuid";
+import { initAuthDomainRoutes } from "./controllers/auth";
+import { initLogoutHandler } from "./controllers/auth/logout";
+import { initUserUpdateEmailHandler } from "./controllers/user-update/email";
+import { initUserUpdateRoleHandler } from "./controllers/user-update/role";
+import { logger } from "./logger";
 
-import {logger} from "./logger";
 
 declare module "fastify" {
   interface FastifyRequest {
@@ -58,76 +54,18 @@ app.addSchema({
 
 app.decorateRequest("userId", "");
 
-const authController = new AuthController(
-  logger,
-  emailSender,
-  config.jwtToken.secret,
-)
-
 const userController = new UserController(
   logger,
 )
 
 // . ROUTER
 // . AUTH PREFIX
-app.register((authRoutes, opts, done) => {
-  authRoutes.post<{
-    Body: FromSchema<typeof AuthRegisterBodySchema>;
-    // Reply: AuthRegisterResponsesSchema;
-  }>(
-    "/register",
-    {
-      schema: {
-        body: AuthRegisterBodySchema,
-        response: AuthRegisterResponsesSchema,
-      },
-    },
-    async (request, reply) => {
-      return authController.register(
-        request,
-        reply
-      )
-    })
 
-  authRoutes.post<{
-    Body: FromSchema<typeof AuthLoginBodySchema>;
-    // Reply: AuthRegisterResponsesSchema;
-  }>(
-    "/login",
-    {
-      schema: {
-        body: AuthLoginBodySchema,
-        response: AuthLoginResponsesSchema,
-      },
-    },
-    async (request, reply) => {
-      return authController.login(
-        request,
-        reply
-      )
-    })
+initAuthDomainRoutes(
+  app,
+  config.jwtToken.secret,
+)
 
-  authRoutes.post<{
-    Body: FromSchema<typeof AuthRequestTokenBodySchema>;
-    // Reply: AuthRequestTokenResponsesSchema;
-  }>(
-    "/request-token",
-    {
-      schema: {
-        body: AuthRequestTokenBodySchema,
-        response: AuthRequestTokenResponsesSchema,
-      },
-    },
-    async (request, reply) => {
-      return authController.requestToken(
-        request,
-        reply
-      )
-    })
-  done()
-}, {
-  prefix: "/auth"
-})
 
 // . AUTHENTICATED
 app.register(async (childServer, opts, done) => {
@@ -175,40 +113,15 @@ app.register(async (childServer, opts, done) => {
   });
 
   childServer.register((authRoutes, opts, done) => {
-    authRoutes.post(
-      "/logout",
-      {
-        schema: {
-          response: AuthLogoutResponsesSchema,
-        },
-      },
-      async (request, reply) => {
-        return authController.logout(
-          request,
-          reply
-        )
-      })
+    initLogoutHandler(authRoutes)
     done()
   }, {
     prefix: "/auth"
   })
 
   childServer.register((userRoutes, opts, done) => {
-    // UPDATE USER
-    userRoutes.put<{
-      Body: FromSchema<typeof UserUpdateBodySchema>;
-    }>(
-      "/",
-      {
-        schema: {
-          body: UserUpdateBodySchema,
-        },
-      },
-      async (request, reply) => {
-        return userController.update(
-          request,
-        )
-      })
+    initUserUpdateEmailHandler(userRoutes);
+    initUserUpdateRoleHandler(userRoutes);
 
     // GET ME
     userRoutes.get(
