@@ -1,9 +1,11 @@
-import {LoginBodySchema, LoginResponsesSchema} from "controllers/authentication/login/req-res";
+import {LoginBodySchema, LoginResponsesSchema} from "http/authentication/login/req-res";
+
+import {TempToken} from "commands/models/temp-token";
 import {FastifyInstance} from "fastify";
 import {FromSchema} from "json-schema-to-ts";
-import {TempToken} from "models/temp-token";
 import {JWTToken} from "utils/jwt-tokens";
 import {SuccessResponse, SuccessResponseR} from "utils/responses";
+
 
 
 export const initLoginHandler = (

@@ -1,4 +1,4 @@
-import {User} from "models/user";
+import {User} from "commands/models/user";
 import {BaseEntity, Column, Entity, ManyToOne, PrimaryColumn} from "typeorm";
 import {v4} from "uuid";
 

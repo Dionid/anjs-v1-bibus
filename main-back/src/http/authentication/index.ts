@@ -1,8 +1,9 @@
-import {initLoginHandler} from "controllers/authentication/login";
-import {initRegisterHandler} from "controllers/authentication/register";
-import {initRequestTokenHandler} from "controllers/authentication/request-token";
 import {emailSender} from "email-sender";
 import {FastifyInstance} from "fastify";
+
+import {initLoginHandler} from "src/http/authentication/login";
+import {initRegisterHandler} from "src/http/authentication/register";
+import {initRequestTokenHandler} from "src/http/authentication/request-token";
 
 
 export const initAuthDomainRoutes = (

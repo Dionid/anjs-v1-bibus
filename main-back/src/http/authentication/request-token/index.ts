@@ -1,12 +1,13 @@
-import {EmailSender} from "controllers/authentication/email-sender";
+import {UserEmail} from "commands/models/user-email";
+import {FastifyInstance} from "fastify";
+import {FromSchema} from "json-schema-to-ts";
+import {SuccessResponse, SuccessResponseWR} from "utils/responses";
+
+import {EmailSender} from "src/http/authentication/email-sender";
 import {
   AuthRequestTokenBodySchema,
   AuthRequestTokenResponsesSchema
-} from "controllers/authentication/request-token/req-res";
-import {FastifyInstance} from "fastify";
-import {FromSchema} from "json-schema-to-ts";
-import {UserEmail} from "models/user-email";
-import {SuccessResponse, SuccessResponseWR} from "utils/responses";
+} from "src/http/authentication/request-token/req-res";
 
 
 export const initRequestTokenHandler = (

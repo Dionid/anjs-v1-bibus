@@ -1,12 +1,12 @@
 import "reflect-metadata";
 
+import {JwtToken} from "commands/models/jwt-token";
+import {TempToken} from "commands/models/temp-token";
+import {User} from "commands/models/user";
+import {UserEmail} from "commands/models/user-email";
 import {config} from "config";
 import {knexConnection} from "database";
 import {app} from "fastify-app";
-import {JwtToken} from "models/jwt-token";
-import {TempToken} from "models/temp-token";
-import {User} from "models/user";
-import {UserEmail} from "models/user-email";
 import {createConnection} from "typeorm";
 
 

@@ -1,8 +1,9 @@
-import {EmailSender} from "controllers/authentication/email-sender";
-import {register} from "controllers/authentication/register/handler";
-import {AuthRegisterBodySchema, AuthRegisterResponsesSchema} from "controllers/authentication/register/req-res";
 import {FastifyInstance} from "fastify";
 import {FromSchema} from "json-schema-to-ts";
+
+import {EmailSender} from "src/http/authentication/email-sender";
+import {register} from "src/http/authentication/register/handler";
+import {AuthRegisterBodySchema, AuthRegisterResponsesSchema} from "src/http/authentication/register/req-res";
 
 
 export const initRegisterHandler = (

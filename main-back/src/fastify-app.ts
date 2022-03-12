@@ -1,15 +1,18 @@
+import {initAuthDomainRoutes} from "http/authentication";
+import {initLogoutHandler} from "http/authentication/logout";
+import {initChangeEmailByUser} from "http/change-email-by-user";
+import {initGetUser} from "http/get-user";
+import {UserController} from "http/user";
+import { UserUpdateBodySchema} from "http/user.req-res";
+
+import {User} from "commands/models/user";
 import {config} from "config";
-import {initAuthDomainRoutes} from "controllers/authentication";
-import {initLogoutHandler} from "controllers/authentication/logout";
-import {initGetUser} from "controllers/get-user";
-import {UserController} from "controllers/user";
-import { UserUpdateBodySchema} from "controllers/user.req-res";
 import Fastify, { FastifyInstance } from "fastify";
 import fastifySwagger from "fastify-swagger";
 import {FromSchema} from "json-schema-to-ts";
-import {User} from "models/user";
 import {JWTToken} from "utils/jwt-tokens";
 import {v4} from "uuid";
+
 
 import {logger} from "./logger";
 
@@ -160,6 +163,7 @@ app.register(async (childServer, opts, done) => {
 
     // GET USER BY ID
     initGetUser(userRoutes)
+    initChangeEmailByUser(userRoutes)
 
     done()
   }, {

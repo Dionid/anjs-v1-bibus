@@ -1,8 +1,10 @@
-import {UserGetOneParamsSchema, UserUpdateBodySchema} from "controllers/user.req-res";
+import {UserGetOneParamsSchema, UserUpdateBodySchema} from "http/user.req-res";
+
+import {User} from "commands/models/user";
 import { FastifyRequest} from "fastify";
 import {FromSchema} from "json-schema-to-ts";
-import {User} from "models/user";
 import pino from "pino";
+
 
 
 export class UserController {

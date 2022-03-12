@@ -1,9 +1,10 @@
-import {ChangeUserByEmailBodySchema, ChangeUserByEmailResponsesSchema} from "controllers/change-email-by-user/req-res";
+import {ChangeUserByEmailBodySchema, ChangeUserByEmailResponsesSchema} from "http/change-email-by-user/req-res";
+
+import {changeEmailByUserCommandHandler} from "commands/handlers/change-email-by-user";
 import {FastifyInstance} from "fastify";
 import {FromSchema} from "json-schema-to-ts";
-import {User} from "models/user";
-import {UserEmail} from "models/user-email";
 import {SuccessResponse, SuccessResponseWR} from "utils/responses";
+
 
 
 export const initChangeEmailByUser = (
@@ -23,27 +24,21 @@ export const initChangeEmailByUser = (
     },
     async (request): Promise<SuccessResponseWR> => {
       if (!request.userId) {
-        throw new Error(`UserId must exist`)
+        throw new Error(`User reuqired`)
       }
 
-      const newEmail = request.body["new-email"]
-
-      if (await UserEmail.findOne({
-        where: {
-          value: newEmail
+      await changeEmailByUserCommandHandler({
+        type: "ChangeEmailByUserCommand",
+        data: {
+          newEmail: request.body["new-email"],
+          userIdToChangeEmail: request.userId
+        },
+        meta: {
+          userId: request.userId,
+          createdAt: new Date(),
+          transactionId: request.id,
         }
-      })) {
-        throw new Error(`Email already exist`)
-      }
-
-      const user = await User.findOne(request.userId)
-
-      if (!user) {
-        throw new Error(`User must exist`)
-      }
-
-      await user.changeEmail(newEmail)
-      await user.save()
+      })
 
       return SuccessResponse.create(request.id)
     }

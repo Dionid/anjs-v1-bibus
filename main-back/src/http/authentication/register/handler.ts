@@ -1,10 +1,11 @@
-import {EmailSender} from "controllers/authentication/email-sender";
-import {AuthRegisterBodySchema} from "controllers/authentication/register/req-res";
+import {User} from "commands/models/user";
+import {UserEmail} from "commands/models/user-email";
 import {FastifyRequest} from "fastify";
 import {FromSchema} from "json-schema-to-ts";
-import {User} from "models/user";
-import {UserEmail} from "models/user-email";
 import {SuccessResponse, SuccessResponseWR} from "utils/responses";
+
+import {EmailSender} from "src/http/authentication/email-sender";
+import {AuthRegisterBodySchema} from "src/http/authentication/register/req-res";
 
 
 export const register =

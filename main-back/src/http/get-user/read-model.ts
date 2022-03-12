@@ -1,4 +1,4 @@
-import {UserRole} from "models/user";
+import {UserRole} from "commands/models/user";
 import {BaseEntity, Column, Entity} from "typeorm";
 
 @Entity("user")
@@ -15,7 +15,7 @@ export class GetUserReadModel extends BaseEntity {
 
   @Column()
   email: string
-  
+
   @Column({ type: 'string'})
   "registration-date": string
 }
