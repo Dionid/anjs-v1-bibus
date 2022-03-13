@@ -7,6 +7,8 @@ import {UserEmail} from "commands/models/user-email";
 import {config} from "config";
 import {knexConnection} from "database";
 import {app} from "fastify-app";
+import {gqlApp} from "gql-app";
+import {logger} from "logger";
 import {createConnection} from "typeorm";
 
 
@@ -33,4 +35,8 @@ import {createConnection} from "typeorm";
   })
 
   await app.listen(config.http.port, "0.0.0.0");
+
+  gqlApp.listen({ port: process.env.PORT || 4000, host: "0.0.0.0" }).then(({ url }) => {
+    logger.info(`🚀  NEW Server ready at ${url}`);
+  });
 })();

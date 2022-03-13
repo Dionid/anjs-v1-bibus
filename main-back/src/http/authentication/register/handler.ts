@@ -1,11 +1,13 @@
+import {EmailSender} from "http/authentication/email-sender";
+import {AuthRegisterBodySchema} from "http/authentication/register/req-res";
+
 import {User} from "commands/models/user";
 import {UserEmail} from "commands/models/user-email";
 import {FastifyRequest} from "fastify";
 import {FromSchema} from "json-schema-to-ts";
+import {Email} from "utils/branded-types";
 import {SuccessResponse, SuccessResponseWR} from "utils/responses";
 
-import {EmailSender} from "src/http/authentication/email-sender";
-import {AuthRegisterBodySchema} from "src/http/authentication/register/req-res";
 
 
 export const register =
@@ -17,7 +19,9 @@ export const register =
     }
 
     // . Create new user, email and passwordless token
-    const user = await User.registerUser(request.body.email)
+    const user = await User.registerUser(
+      Email.ofString(request.body.email)
+    )
     await user.save()
 
     // . Send token to email

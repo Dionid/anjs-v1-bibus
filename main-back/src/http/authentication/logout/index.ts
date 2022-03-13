@@ -1,9 +1,10 @@
+import {LogoutResponsesSchema} from "http/authentication/logout/req-res";
+
 import {User} from "commands/models/user";
 import {FastifyInstance} from "fastify";
 import {FromSchema} from "json-schema-to-ts";
 import {SuccessResponse, SuccessResponseWR} from "utils/responses";
 
-import {LogoutResponsesSchema} from "src/http/authentication/logout/req-res";
 
 
 export const initLogoutHandler = (

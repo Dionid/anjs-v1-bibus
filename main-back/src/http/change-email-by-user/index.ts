@@ -1,11 +1,11 @@
 import {ChangeUserByEmailBodySchema, ChangeUserByEmailResponsesSchema} from "http/change-email-by-user/req-res";
 
-import {changeEmailByUserCommandHandler} from "commands/handlers/change-email-by-user";
+import { changeEmailByUserCommandHandler} from "commands/handlers/change-email-by-user";
+import {UserId} from "commands/models/user";
 import {FastifyInstance} from "fastify";
 import {FromSchema} from "json-schema-to-ts";
+import {Email} from "utils/branded-types";
 import {SuccessResponse, SuccessResponseWR} from "utils/responses";
-
-
 
 export const initChangeEmailByUser = (
   app: FastifyInstance,
@@ -30,8 +30,8 @@ export const initChangeEmailByUser = (
       await changeEmailByUserCommandHandler({
         type: "ChangeEmailByUserCommand",
         data: {
-          newEmail: request.body["new-email"],
-          userIdToChangeEmail: request.userId
+          newEmail: Email.ofString(request.body["new-email"]),
+          userIdToChangeEmail: UserId.ofString(request.userId)
         },
         meta: {
           userId: request.userId,

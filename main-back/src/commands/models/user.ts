@@ -2,7 +2,22 @@ import {JwtToken} from "commands/models/jwt-token";
 import {TempToken} from "commands/models/temp-token";
 import {UserEmail} from "commands/models/user-email";
 import {BaseEntity, Column, Entity, OneToMany, PrimaryColumn} from "typeorm";
-import {v4} from "uuid";
+import {Email} from "utils/branded-types";
+import {v4, validate} from "uuid";
+
+export type UserId = string & { readonly UserId: unique symbol }
+export const UserId = {
+  new: () => {
+    return v4() as UserId
+  },
+  ofString: (value: string) => {
+    if (!validate(value)) {
+      throw new Error(`Incorrect user id`)
+    }
+
+    return value as UserId
+  }
+}
 
 export enum UserRole {
   ADMIN = "admin",
@@ -12,7 +27,7 @@ export enum UserRole {
 @Entity()
 export class User extends BaseEntity {
   @PrimaryColumn()
-  id: string;
+  id: UserId;
 
   @Column({
     type: "enum",
@@ -67,9 +82,9 @@ export class User extends BaseEntity {
     return mainEmail.lastTempToken()
   }
 
-  static async registerUser(email: string) {
+  static async registerUser(email: Email) {
     const user = new User()
-    user.id = v4()
+    user.id = UserId.new()
     user.role = UserRole.USER
     user.emails = []
     user.jwtTokens = []
