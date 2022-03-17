@@ -1,5 +1,4 @@
 import {User, UserId} from "commands/models/user";
-import {UserEmail} from "commands/models/user-email";
 import {Email} from "utils/branded-types";
 import {Command} from "utils/cqrs";
 
@@ -66,25 +65,7 @@ export type ChangeEmailByUserCommand = Command<"ChangeEmailByUserCommand", Chang
 export const changeEmailByUserCommandHandler = async (
   command: ChangeEmailByUserCommand,
 ): Promise<void> => {
-  if (!command.meta.userId) {
-    throw new Error(`User is required`)
-  }
-
   const {newEmail, userIdToChangeEmail} = command.data
-
-  // . Email is exist
-  if (await UserEmail.findOne({
-    where: {
-      value: newEmail
-    }
-  })) {
-    throw new Error(`Email already exist`)
-  }
-
-  if (userIdToChangeEmail !== command.meta.userId) {
-    // . Check is admin
-    // ...
-  }
 
   // . Get user
   const user = await User.findOne(userIdToChangeEmail)

@@ -1,7 +1,7 @@
 import {ChangeUserByEmailBodySchema, ChangeUserByEmailResponsesSchema} from "http/change-email-by-user/req-res";
 
-import { changeEmailByUserCommandHandler} from "commands/handlers/change-email-by-user";
 import {UserId} from "commands/models/user";
+import {changeEmailByUserCommandHandlerWithAspects} from "cq-handlers";
 import {FastifyInstance} from "fastify";
 import {FromSchema} from "json-schema-to-ts";
 import {Email} from "utils/branded-types";
@@ -27,7 +27,7 @@ export const initChangeEmailByUser = (
         throw new Error(`User reuqired`)
       }
 
-      await changeEmailByUserCommandHandler({
+      await changeEmailByUserCommandHandlerWithAspects({
         type: "ChangeEmailByUserCommand",
         data: {
           newEmail: Email.ofString(request.body["new-email"]),

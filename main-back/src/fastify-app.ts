@@ -72,45 +72,40 @@ initAuthDomainRoutes(
 app.register(async (childServer, opts, done) => {
   // . AUTH MIDDLEWARE
   childServer.addHook("onRequest", async (request) => {
-    if (
-      request.url.includes("documentation") ||
-      request.url.includes("health")
-    ) {
-      return;
-    }
-
     const headerToken = request.headers.authorization;
 
-    if (!headerToken) {
-      throw new Error(`Permission denied`);
+    if (headerToken) {
+      const token = headerToken.split("Bearer ")[1];
+
+      if (!token) {
+        throw new Error(`No token in header with Bearer`);
+      }
+
+      const decoded = JWTToken.verify(config.jwtToken.secret, token)
+
+      const user = await User.findOne({
+        where: {
+          id: decoded.userId,
+        },
+      })
+
+      if (!user) {
+        throw new Error(`No user by token`);
+      }
+
+      const jwtToken = await user.jwtTokenById(decoded.id)
+
+      if (!jwtToken) {
+        throw new Error(`JWT token not found`)
+      }
+
+      if (!jwtToken.active()) {
+        throw new Error(`Session expired please relogin`)
+      }
+
+      // eslint-disable-next-line require-atomic-updates
+      request.userId = user.id;
     }
-
-    const token = headerToken.split("Bearer ")[1];
-
-    if (!token) {
-      throw new Error(`Permission denied`);
-    }
-
-    const decoded = JWTToken.verify(config.jwtToken.secret, token)
-
-    const user = await User.findOne({
-      where: {
-        id: decoded.userId,
-      },
-    })
-
-    if (!user) {
-      throw new Error(`Permission denied`);
-    }
-
-    const jwtToken = await user.jwtTokenById(decoded.id)
-
-    if (!jwtToken || !jwtToken.active()) {
-      throw new Error(`Permission denied`)
-    }
-
-    // eslint-disable-next-line require-atomic-updates
-    request.userId = user.id;
   });
 
   childServer.register((authRoutes, opts, done) => {
@@ -162,7 +157,9 @@ app.register(async (childServer, opts, done) => {
       })
 
     // GET USER BY ID
-    initGetUser(userRoutes)
+    initGetUser(
+      userRoutes,
+    )
     initChangeEmailByUser(userRoutes)
 
     done()

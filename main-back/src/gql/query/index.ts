@@ -1,11 +1,11 @@
+import {getUserQueryHandlerWithAspects} from "cq-handlers";
 import {QueryResolvers} from "gql/gqlgen-types";
 import {ResolversCtx} from "gql/resolver-ctx";
-import {getUserQueryHandler} from "queries/handlers/get-user";
 
 
 export const Query: QueryResolvers<ResolversCtx> = {
   getUser: async (parent, args, ctx) => {
-    const qResult = await getUserQueryHandler({
+    const qResult = await getUserQueryHandlerWithAspects({
       type: "GetUserQuery",
       data: {
         userId: args.userId,

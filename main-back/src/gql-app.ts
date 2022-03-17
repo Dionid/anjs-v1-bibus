@@ -11,38 +11,43 @@ export const gqlApp = new ApolloServer({
   schema,
   context: async ({req}): Promise<ResolversCtx> => {
     const headerToken = req.headers.authorization;
+    let userId: string | null = null
 
-    if (!headerToken) {
-      throw new Error(`Permission denied`);
-    }
+    if (headerToken) {
+      const token = headerToken.split("Bearer ")[1];
 
-    const token = headerToken.split("Bearer ")[1];
+      if (!token) {
+        throw new Error(`No token in header with Bearer`);
+      }
 
-    if (!token) {
-      throw new Error(`Permission denied`);
-    }
+      const decoded = JWTToken.verify(config.jwtToken.secret, token)
 
-    const decoded = JWTToken.verify(config.jwtToken.secret, token)
+      const user = await User.findOne({
+        where: {
+          id: decoded.userId,
+        },
+      })
 
-    const user = await User.findOne({
-      where: {
-        id: decoded.userId,
-      },
-    })
+      if (!user) {
+        throw new Error(`No user by token`);
+      }
 
-    if (!user) {
-      throw new Error(`Permission denied`);
-    }
+      const jwtToken = await user.jwtTokenById(decoded.id)
 
-    const jwtToken = await user.jwtTokenById(decoded.id)
+      if (!jwtToken) {
+        throw new Error(`JWT token not found`)
+      }
 
-    if (!jwtToken || !jwtToken.active()) {
-      throw new Error(`Permission denied`)
+      if (!jwtToken.active()) {
+        throw new Error(`Session expired please relogin`)
+      }
+
+      userId = user.id
     }
 
     return {
       reqId: v4(),
-      userId: user.id,
+      userId,
     }
   },
   introspection: true,
