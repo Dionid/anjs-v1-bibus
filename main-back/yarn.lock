@@ -4065,10 +4065,10 @@ interpret@^2.2.0:
   resolved "https://registry.yarnpkg.com/interpret/-/interpret-2.2.0.tgz#1a78a0b5965c40a5416d007ad6f50ad27c417df9"
   integrity sha512-Ju0Bz/cEia55xDwUWEa8+olFpCiQoypjnQySseKtmjNrnps3P+xfpUmGr90T7yjlVJmOtybRvPXhKMbHr+fWnw==
 
-introspect-it@^0.1.6:
-  version "0.1.6"
-  resolved "https://registry.yarnpkg.com/introspect-it/-/introspect-it-0.1.6.tgz#ab8ee24f3312074af78d3a755170958a35a54f9c"
-  integrity sha512-7JH0t12T6o0qckf9IFhusAwAnwYl/N91SCWFPvlnRB89T6G4zTUhAgvR8EjkrpO3A8hzanf/KGAya7OKBrylRw==
+introspect-it@0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/introspect-it/-/introspect-it-0.2.0.tgz#0e869649bd5f295ac5de18127f7fee70faab23e9"
+  integrity sha512-kPajH4X0zaErSAAMoRK0hR484089ikuHt8zttEi/sEnanHjsLgKnToG9PNff9Z8kfHQPa8MLvYqsy5+5iFFbVA==
   dependencies:
     lodash "^4.17.15"
     pg-promise "^10.11.1"
