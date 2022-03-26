@@ -1,13 +1,13 @@
-import { User } from "commands/models/user";
-import { BaseEntity, Column, Entity, ManyToOne, PrimaryColumn } from "typeorm";
+import { UserId } from "commands/models/user";
+import { BaseEntity, Column, Entity, PrimaryColumn } from "typeorm";
 
 @Entity()
 export class JwtToken extends BaseEntity {
   @PrimaryColumn()
   id: string;
 
-  @ManyToOne((type) => User, (user) => user.jwtTokens)
-  user: User;
+  @Column("string")
+  userId: UserId;
 
   @Column({ type: "timestamp", nullable: true })
   logoutDate: Date | null;
@@ -20,12 +20,12 @@ export class JwtToken extends BaseEntity {
 
   @Column({ type: "timestamp", onUpdate: "CURRENT_TIMESTAMP", nullable: true })
   updatedAt: Date;
-
-  logout() {
-    this.logoutDate = new Date();
-  }
-
-  active() {
-    return this.logoutDate === null && this.banDate === null;
-  }
 }
+
+// logout() {
+//   this.logoutDate = new Date();
+// }
+//
+// active() {
+//   return this.logoutDate === null && this.banDate === null;
+// }

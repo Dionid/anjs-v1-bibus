@@ -1,21 +1,19 @@
-import {initAuthDomainRoutes} from "http/authentication";
-import {initLogoutHandler} from "http/authentication/logout";
-import {initChangeEmailByUser} from "http/change-email-by-user";
-import {initGetUser} from "http/get-user";
-import {UserController} from "http/user";
-import { UserUpdateBodySchema} from "http/user.req-res";
+import { initAuthDomainRoutes } from "http/authentication";
+import { initLogoutHandler } from "http/authentication/logout";
+import { initChangeEmailByUser } from "http/change-email-by-user";
+import { initGetUser } from "http/get-user";
+import { UserController } from "http/user";
+import { UserUpdateBodySchema } from "http/user.req-res";
 
-import {User} from "commands/models/user";
-import {config} from "config";
+import { User } from "commands/models/user";
+import { config } from "config";
 import Fastify, { FastifyInstance } from "fastify";
 import fastifySwagger from "fastify-swagger";
-import {FromSchema} from "json-schema-to-ts";
-import {JWTToken} from "utils/jwt-tokens";
-import {v4} from "uuid";
+import { FromSchema } from "json-schema-to-ts";
+import { JWTToken } from "utils/jwt-tokens";
+import { v4 } from "uuid";
 
-
-import {logger} from "./logger";
-
+import { logger } from "./logger";
 
 declare module "fastify" {
   interface FastifyRequest {
@@ -57,16 +55,11 @@ app.addSchema({
 
 app.decorateRequest("userId", "");
 
-const userController = new UserController(
-  logger,
-)
+const userController = new UserController(logger);
 
 // . ROUTER
 // . AUTH PREFIX
-initAuthDomainRoutes(
-  app,
-  config.jwtToken.secret,
-)
+initAuthDomainRoutes(app, config.jwtToken.secret);
 
 // . AUTHENTICATED
 app.register(async (childServer, opts, done) => {
@@ -81,26 +74,26 @@ app.register(async (childServer, opts, done) => {
         throw new Error(`No token in header with Bearer`);
       }
 
-      const decoded = JWTToken.verify(config.jwtToken.secret, token)
+      const decoded = JWTToken.verify(config.jwtToken.secret, token);
 
       const user = await User.findOne({
         where: {
           id: decoded.userId,
         },
-      })
+      });
 
       if (!user) {
         throw new Error(`No user by token`);
       }
 
-      const jwtToken = await user.jwtTokenById(decoded.id)
+      const jwtToken = await user.jwtTokenById(decoded.id);
 
       if (!jwtToken) {
-        throw new Error(`JWT token not found`)
+        throw new Error(`JWT token not found`);
       }
 
       if (!jwtToken.active()) {
-        throw new Error(`Session expired please relogin`)
+        throw new Error(`Session expired please relogin`);
       }
 
       // eslint-disable-next-line require-atomic-updates
@@ -108,64 +101,65 @@ app.register(async (childServer, opts, done) => {
     }
   });
 
-  childServer.register((authRoutes, opts, done) => {
-    initLogoutHandler(
-      authRoutes,
-    )
-    done()
-  }, {
-    prefix: "/auth"
-  })
+  childServer.register(
+    (authRoutes, opts, done) => {
+      initLogoutHandler(authRoutes);
+      done();
+    },
+    {
+      prefix: "/auth",
+    }
+  );
 
-  childServer.register((userRoutes, opts, done) => {
-    // UPDATE USER
-    userRoutes.put<{
-      Body: FromSchema<typeof UserUpdateBodySchema>;
-    }>(
-      "/",
-      {
-        schema: {
-          body: UserUpdateBodySchema,
+  childServer.register(
+    (userRoutes, opts, done) => {
+      // UPDATE USER
+      userRoutes.put<{
+        Body: FromSchema<typeof UserUpdateBodySchema>;
+      }>(
+        "/",
+        {
+          schema: {
+            body: UserUpdateBodySchema,
+          },
         },
-      },
-      async (request, reply) => {
-        return userController.update(
-          request,
-        )
-      })
+        async (request, reply) => {
+          return userController.update(request);
+        }
+      );
 
-    // GET ME
-    userRoutes.get(
-      "/me",
-      {
-        schema: {},
-      },
-      async (request, reply) => {
-        return userController.getMe(
-          request,
-        )
-      })
+      // GET ME
+      userRoutes.get(
+        "/me",
+        {
+          schema: {},
+        },
+        async (request, reply) => {
+          return userController.getMe(request);
+        }
+      );
 
-    // GET USERS LIST
-    userRoutes.get(
-      "/",
-      {
-        schema: {},
-      },
-      async (request, reply) => {
-        return userController.list()
-      })
+      // GET USERS LIST
+      userRoutes.get(
+        "/",
+        {
+          schema: {},
+        },
+        async (request, reply) => {
+          return userController.list();
+        }
+      );
 
-    // GET USER BY ID
-    initGetUser(
-      userRoutes,
-    )
-    initChangeEmailByUser(userRoutes)
+      // GET USER BY ID
+      initGetUser(userRoutes);
+      initChangeEmailByUser(userRoutes);
 
-    done()
-  }, {
-    prefix: "/user"
-  })
+      done();
+    },
+    {
+      prefix: "/user-management",
+    }
+  );
 
-  done()
-})
+  done();
+});

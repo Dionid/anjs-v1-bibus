@@ -1,30 +1,35 @@
-import {knexConnection} from "database";
-import {QueryResult} from "pg";
-import {Query} from "utils/cqrs";
+import { knexConnection } from "database";
+import { QueryResult } from "pg";
+import { Query } from "utils/cqrs";
 import {
-  UserEmailTableColumnNames, UserEmailTableName,
+  UserEmailTableColumnNames,
+  UserEmailTableName,
   UserEmailTableValue,
   UserTableColumnNames,
   UserTableCreatedAt,
-  UserTableId, UserTableName,
-  UserTableRole
+  UserTableId,
+  UserTableName,
+  UserTableRole,
 } from "utils/introspect-it-schema";
-import {SuccessResponse, SuccessResponseR} from "utils/responses";
+import { SuccessResponse, SuccessResponseR } from "utils/responses";
 
-
-export type GetUserQuery = Query<"GetUserQuery", {
-  userId: string
-}, GetUserQueryResult>
+export type GetUserQuery = Query<
+  "GetUserQuery",
+  {
+    userId: string;
+  },
+  GetUserQueryResult
+>;
 
 export type GetUserQueryResult = SuccessResponseR<{
-  id: string,
-  role: string,
-  email: string,
-  registrationDate: string,
-}>
+  id: string;
+  role: string;
+  email: string;
+  registrationDate: string;
+}>;
 
 export const getUserQueryHandler = async (
-  query: GetUserQuery,
+  query: GetUserQuery
 ): Promise<GetUserQueryResult> => {
   // // ORM
   // const result = await User.findOne({
@@ -34,10 +39,10 @@ export const getUserQueryHandler = async (
   // })
   //
   // if (!result) {
-  //   throw new Error(`No user`)
+  //   throw new Error(`No user-management`)
   // }
   //
-  // const user = {
+  // const user-management = {
   //   id: result.id,
   //   email: result.mainEmail().value,
   //   role: result.role,
@@ -45,7 +50,7 @@ export const getUserQueryHandler = async (
   // }
 
   // // ORM READ MODEL (not working)
-  // const user = await GetUserReadModel.findOne({
+  // const user-management = await GetUserReadModel.findOne({
   //   where: {
   //     id: request.params.id,
   //   },
@@ -82,19 +87,22 @@ export const getUserQueryHandler = async (
   //   email: UserEmailTableValue,
   // }> = await query
   //
-  // const user = result[0]
+  // const user-management = result[0]
 
   // RAW SQL + INTROSPECTION
-  const userTableAlias = "u"
-  const userEmailTableAlias = "ue"
-  const registrationDateColumnName = "registration_date"
-  const emailDateColumnName = "email"
-  const result = await knexConnection.raw<QueryResult<{
-    id: UserTableId,
-    role: UserTableRole,
-    registration_date: UserTableCreatedAt,
-    email: UserEmailTableValue,
-  }>>(`
+  const userTableAlias = "u";
+  const userEmailTableAlias = "ue";
+  const registrationDateColumnName = "registration_date";
+  const emailDateColumnName = "email";
+  const result = await knexConnection.raw<
+    QueryResult<{
+      id: UserTableId;
+      role: UserTableRole;
+      registration_date: UserTableCreatedAt;
+      email: UserEmailTableValue;
+    }>
+  >(
+    `
         SELECT
           ${userTableAlias}.${UserTableColumnNames.id},
           ${userTableAlias}.${UserTableColumnNames.role},
@@ -103,12 +111,14 @@ export const getUserQueryHandler = async (
         FROM public.${UserTableName} ${userTableAlias}
         LEFT JOIN ${UserEmailTableName} ${userEmailTableAlias} ON ${userEmailTableAlias}."${UserEmailTableColumnNames.userId}" = ${userTableAlias}.${UserTableColumnNames.id}
         WHERE ${userTableAlias}.${UserTableColumnNames.id} = ? AND ${userEmailTableAlias}.${UserEmailTableColumnNames.main} = true;
-      `, [query.data.userId])
+      `,
+    [query.data.userId]
+  );
 
-  const user = result.rows[0]
+  const user = result.rows[0];
 
   if (!user) {
-    throw new Error(`There is no user with this id`)
+    throw new Error(`There is no user with this id`);
   }
 
   return SuccessResponse.create(query.meta.transactionId, {
@@ -116,6 +126,5 @@ export const getUserQueryHandler = async (
     email: user.email,
     role: user.role,
     registrationDate: user.registration_date.toISOString(),
-  })
-}
-
+  });
+};

@@ -5,7 +5,7 @@ import {
 
 import { JwtToken } from "commands/models/jwt-token";
 import { TempToken } from "commands/models/temp-token";
-import { activateMainEmailFromUser } from "commands/operations/user/activate-main-email";
+import { activateMainEmailFromUser } from "commands/operations/user-management/activate-main-email";
 import { FastifyInstance } from "fastify";
 import { FromSchema } from "json-schema-to-ts";
 import { JWTToken } from "utils/jwt-tokens";
@@ -29,7 +29,7 @@ export const initLoginHandler = (
       },
     },
     async (request): Promise<SuccessResponseR<{ token: string }>> => {
-      // . Get temp token with user
+      // . Get temp token with user-management
       const tempToken = await TempToken.findOne({
         where: {
           id: request.body.tempToken,
@@ -39,7 +39,7 @@ export const initLoginHandler = (
             main: true,
           },
         },
-        relations: ["userEmail", "userEmail.user"],
+        relations: ["userEmail", "userEmail.user-management"],
       });
 
       if (!tempToken) {

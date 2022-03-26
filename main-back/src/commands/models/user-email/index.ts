@@ -1,0 +1,64 @@
+import { UserId } from "commands/models/user";
+import { Email } from "utils/branded-types";
+import { UserEmailTable } from "utils/introspect-it-schema";
+import { v4, validate } from "uuid";
+
+export type UserEmailId = string & { readonly UserEmailId: unique symbol };
+export const UserEmailId = {
+  new: () => {
+    return v4() as UserEmailId;
+  },
+  ofString: (value: string) => {
+    if (!validate(value)) {
+      throw new Error(`Incorrect user id`);
+    }
+
+    return value as UserEmailId;
+  },
+};
+
+export type UserEmailStateActivated = {
+  __type: "UserEmailStateActivated";
+  activated: true;
+  value: Email;
+};
+
+export type UserEmailStateInactivated = {
+  __type: "UserEmailStateInactivated";
+  activated: false;
+  value: Email;
+};
+
+export type UserEmailStateEmpty = {
+  __type: "UserEmailStateEmpty";
+  activated: false;
+  value: null;
+};
+
+export type UserEmailState =
+  | UserEmailStateActivated
+  | UserEmailStateInactivated
+  | UserEmailStateEmpty;
+
+export type UserEmail = Omit<UserEmailTable, "activated" | "value"> & {
+  id: UserEmailId;
+  userId: UserId;
+  state: UserEmailState;
+};
+
+export const UserEmail = {
+  newMainNotActivated: (userId: UserId, newEmail: Email): UserEmail => {
+    return {
+      main: true,
+      id: UserEmailId.new(),
+      userId,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      state: {
+        __type: "UserEmailStateInactivated",
+        value: newEmail,
+        activated: false,
+      },
+    };
+  },
+};

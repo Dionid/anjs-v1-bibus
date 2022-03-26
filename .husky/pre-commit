@@ -4,4 +4,4 @@
 yarn --silent lint-staged
 cd main-back
 yarn test
-yarn build
+#yarn build
