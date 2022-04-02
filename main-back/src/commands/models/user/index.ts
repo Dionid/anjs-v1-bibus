@@ -1,4 +1,5 @@
-import { UserTable } from "utils/introspect-it-schema";
+import { UserTable, UserTableRole } from "utils/introspect-it-schema";
+import { Switch } from "utils/switch";
 import { v4, validate } from "uuid";
 
 export type UserId = string & { readonly UserId: unique symbol };
@@ -15,8 +16,34 @@ export const UserId = {
   },
 };
 
+export type UserRole = UserTableRole & { readonly UserRole: unique symbol };
+export const UserRole = {
+  newUser: (): UserRole => {
+    return "user" as UserRole;
+  },
+  newAdmin: () => {
+    return "admin" as UserRole;
+  },
+  ofUserTableRole: (value: UserTableRole) => {
+    return value as UserRole;
+  },
+  ofString: (value: string) => {
+    const v = value as UserTableRole;
+
+    switch (v) {
+      case "user":
+      case "admin":
+      case "manager":
+        return UserRole.ofUserTableRole(v);
+      default:
+        return Switch.safeGuard(v);
+    }
+  },
+};
+
 export type User = UserTable & {
   id: UserId;
+  role: UserRole;
 };
 
 // mainEmail(): UserEmail {

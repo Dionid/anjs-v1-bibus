@@ -6,23 +6,20 @@ import {
 } from "commands/models/user-email/index";
 import { Knex } from "knex";
 import { Email } from "utils/branded-types";
-import { UserEmailTable, UserEmailTableName } from "utils/introspect-it-schema";
+import {
+  UserEmailTable,
+  UserEmailTableName,
+  UserEmailTableValue,
+  UserTableId,
+} from "utils/introspect-it-schema";
 
-export const UserEmailDataMapper = {
-  fromModel: (userEmail: UserEmail): UserEmailTable => {
-    return {
-      id: userEmail.id,
-      main: userEmail.main,
-      activated: userEmail.state.activated,
-      value: userEmail.state.value,
-      userId: userEmail.userId,
-      createdAt: userEmail.createdAt,
-      updatedAt: userEmail.updatedAt,
-    };
-  },
-  toModel: (userEmailTable: UserEmailTable): UserEmail => {
+export const UserEmailStateDataMapper = {
+  toModel: (data: {
+    value: UserEmailTableValue;
+    activated: boolean;
+  }): UserEmailState => {
+    const { value, activated } = data;
     let state: UserEmailState;
-    const { value, activated } = userEmailTable;
 
     if (value !== null) {
       if (activated) {
@@ -46,11 +43,28 @@ export const UserEmailDataMapper = {
       };
     }
 
+    return state;
+  },
+};
+
+export const UserEmailDataMapper = {
+  fromModel: (userEmail: UserEmail): UserEmailTable => {
+    return {
+      id: userEmail.id,
+      main: userEmail.main,
+      activated: userEmail.state.activated,
+      value: userEmail.state.value,
+      userId: userEmail.userId,
+      createdAt: userEmail.createdAt,
+      updatedAt: userEmail.updatedAt,
+    };
+  },
+  toModel: (userEmailTable: UserEmailTable): UserEmail => {
     return {
       main: userEmailTable.main,
       createdAt: userEmailTable.createdAt,
       updatedAt: userEmailTable.updatedAt,
-      state,
+      state: UserEmailStateDataMapper.toModel(userEmailTable),
       id: userEmailTable.id as UserEmailId,
       userId: userEmailTable.userId as UserId,
     };
@@ -84,6 +98,21 @@ export const update = async (
     .update(UserEmailDataMapper.fromModel(userEmail));
 };
 
+export const updateMainEmailValue = async (
+  knex: Knex,
+  userId: UserTableId,
+  value: UserEmailTableValue
+) => {
+  await UserEmailKnexTable(knex)
+    .where({
+      userId,
+      main: true,
+    })
+    .update({
+      value,
+    });
+};
+
 export const insert = async (
   knex: Knex,
   userEmail: UserEmail
@@ -95,6 +124,7 @@ export const insert = async (
 
 export const UserEmailDataService = {
   findById,
+  updateMainEmailValue,
   update,
   insert,
 };

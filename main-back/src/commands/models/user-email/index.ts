@@ -40,10 +40,13 @@ export type UserEmailState =
   | UserEmailStateInactivated
   | UserEmailStateEmpty;
 
-export type UserEmail = Omit<UserEmailTable, "activated" | "value"> & {
+export type UserEmail<S extends UserEmailState = UserEmailState> = Omit<
+  UserEmailTable,
+  "activated" | "value"
+> & {
   id: UserEmailId;
   userId: UserId;
-  state: UserEmailState;
+  state: S;
 };
 
 export const UserEmail = {

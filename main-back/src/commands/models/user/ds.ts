@@ -29,6 +29,12 @@ export const findById = async (
   return userTable ? UserDataMapper.toModel(userTable) : undefined;
 };
 
+export const findAll = async (knex: Knex): Promise<User[]> => {
+  const userTableData = await UserKnexTable(knex);
+
+  return userTableData.map(UserDataMapper.toModel);
+};
+
 export const update = async (knex: Knex, user: User): Promise<void> => {
   await UserKnexTable(knex)
     .where({ id: user.id })
@@ -41,6 +47,7 @@ export const insert = async (knex: Knex, user: User): Promise<void> => {
 
 export const UserDataService = {
   findById,
+  findAll,
   update,
   insert,
 };

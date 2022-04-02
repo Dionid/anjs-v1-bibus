@@ -102,7 +102,7 @@ export const TypeormMetadataTableColumnNames = {
 } as const;
 
 export type UserTableId = string;
-export type UserTableRole = "admin" | "user";
+export type UserTableRole = "admin" | "user" | "manager";
 export type UserTableCreatedAt = Date;
 export type UserTableUpdatedAt = Date | null;
 
@@ -127,10 +127,17 @@ export const UserTableColumnNames = {
   updatedAt: UserTableUpdatedAtColumnName,
 } as const;
 
+export type ProfileTable = {
+  id: string;
+  userId: string;
+  firstName: string;
+  lastName: string | null;
+};
+
 export type UserEmailTableId = string;
 export type UserEmailTableMain = boolean;
 export type UserEmailTableActivated = boolean;
-export type UserEmailTableValue = string;
+export type UserEmailTableValue = string | null;
 export type UserEmailTableUserId = string | null;
 export type UserEmailTableCreatedAt = Date;
 export type UserEmailTableUpdatedAt = Date | null;
