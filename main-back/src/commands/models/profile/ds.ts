@@ -1,6 +1,7 @@
 import { Profile, ProfileId } from "commands/models/profile/index";
 import { UserId } from "commands/models/user";
-import { ProfileTable } from "utils/introspect-it-schema";
+
+import { ProfileTable } from "../../../libs/@bibus/the-king/introspect-it-schema";
 
 export const ProfileDataMapper = {
   toModel: (tableData: ProfileTable): Profile => {

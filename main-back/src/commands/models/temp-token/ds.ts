@@ -1,7 +1,11 @@
 import { TempToken, TempTokenId } from "commands/models/temp-token/index";
 import { UserEmailId } from "commands/models/user-email";
 import { Knex } from "knex";
-import { TempTokenTable, TempTokenTableName } from "utils/introspect-it-schema";
+
+import {
+  TempTokenTable,
+  TempTokenTableName,
+} from "../../../libs/@bibus/the-king/introspect-it-schema";
 
 export const TempTokenDataMapper = {
   fromModel: (tempToken: TempToken): TempTokenTable => {

@@ -5,13 +5,15 @@ import {
   UserEmailState,
 } from "commands/models/user-email/index";
 import { Knex } from "knex";
-import { Email } from "utils/branded-types";
+
+import { Email } from "src/libs/branded-types";
+
 import {
   UserEmailTable,
   UserEmailTableName,
   UserEmailTableValue,
   UserTableId,
-} from "utils/introspect-it-schema";
+} from "../../../libs/@bibus/the-king/introspect-it-schema";
 
 export const UserEmailStateDataMapper = {
   toModel: (data: {

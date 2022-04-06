@@ -51,10 +51,12 @@
   "scripts": {
     "start": "NODE_PATH=./build node build/apps/main-gql/index.js",
     "test": "jest --passWithNoTests",
-    "introspect": "NODE_TLS_REJECT_UNAUTHORIZED=0 env-cmd -f ./.env introspect-it > src/utils/introspect-it-schema.ts",
+    "introspect": "NODE_TLS_REJECT_UNAUTHORIZED=0 env-cmd -f ./.env introspect-it > src/libs/@bibus/the-king/introspect-it-schema.ts",
     "gql:gen": "graphql-codegen --config codegen.yaml",
     "build": "rimraf build && npm run introspect && npm run gql:gen && tsc -P tsconfig.build.json",
-    "dev:mvc": "npm run build && NODE_PATH=./build node build/index.js"
+    "dev:mvc": "npm run build && NODE_PATH=./build node build/index.js",
+    "dev:commander": "npm run build && NODE_PATH=./build node build/apps/commander/index.js",
+    "dev:krusa": "npm run build && NODE_PATH=./build node build/apps/krusa/index.js"
   },
   "jest": {
     "testEnvironment": "node",

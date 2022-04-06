@@ -1,6 +1,7 @@
 import { UserEmailId } from "commands/models/user-email";
-import { TempTokenTable } from "utils/introspect-it-schema";
 import { v4, validate } from "uuid";
+
+import { TempTokenTable } from "../../../libs/@bibus/the-king/introspect-it-schema";
 
 export type TempTokenId = string & { readonly TempTokenId: unique symbol };
 export const TempTokenId = {

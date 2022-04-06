@@ -1,6 +1,12 @@
-import { knexConnection } from "database";
+import { knexConnection } from "apps/main/database";
 import { QueryResult } from "pg";
-import { Query } from "utils/cqrs";
+
+import { Query } from "src/libs/cqrs";
+
+import {
+  SuccessResponse,
+  SuccessResponseR,
+} from "../../../libs/@bibus/responses";
 import {
   UserEmailTableColumnNames,
   UserEmailTableName,
@@ -10,8 +16,7 @@ import {
   UserTableId,
   UserTableName,
   UserTableRole,
-} from "utils/introspect-it-schema";
-import { SuccessResponse, SuccessResponseR } from "utils/responses";
+} from "../../../libs/@bibus/the-king/introspect-it-schema";
 
 export type GetUserQuery = Query<
   "GetUserQuery",

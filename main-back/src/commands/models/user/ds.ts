@@ -1,6 +1,10 @@
-import { User, UserId } from "commands/models/user";
+import { User, UserId, UserRole } from "commands/models/user";
 import { Knex } from "knex";
-import { UserTable, UserTableName } from "utils/introspect-it-schema";
+
+import {
+  UserTable,
+  UserTableName,
+} from "../../../libs/@bibus/the-king/introspect-it-schema";
 
 export const UserDataMapper = {
   fromModel: (user: User): UserTable => {
@@ -9,6 +13,7 @@ export const UserDataMapper = {
   toModel: (userTable: UserTable): User => {
     return {
       ...userTable,
+      role: UserRole.ofUserTableRole(userTable.role),
       id: userTable.id as UserId,
     };
   },

@@ -1,6 +1,8 @@
 import { UserId } from "commands/models/user";
-import { createEntityStringId } from "utils/branded-types";
-import { ProfileTable } from "utils/introspect-it-schema";
+
+import { createEntityStringId } from "src/libs/branded-types";
+
+import { ProfileTable } from "../../../libs/@bibus/the-king/introspect-it-schema";
 
 export type ProfileId = string & { readonly ProfileId: unique symbol };
 export const ProfileId = createEntityStringId<ProfileId>();

@@ -1,7 +1,9 @@
 import { UserId } from "commands/models/user";
-import { Email } from "utils/branded-types";
-import { UserEmailTable } from "utils/introspect-it-schema";
 import { v4, validate } from "uuid";
+
+import { Email } from "src/libs/branded-types";
+
+import { UserEmailTable } from "../../../libs/@bibus/the-king/introspect-it-schema";
 
 export type UserEmailId = string & { readonly UserEmailId: unique symbol };
 export const UserEmailId = {

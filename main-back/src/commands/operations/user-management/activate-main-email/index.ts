@@ -10,9 +10,9 @@ export const activateMainEmail = async (
     throw new Error(`...`);
   }
 
-  if (!mainEmail.activated) {
-    mainEmail.activated = true;
-    await mainEmail.save();
+  if (!mainEmail.state.activated) {
+    mainEmail.state.activated = true;
+    await mainEmail.state.save();
   }
 };
 

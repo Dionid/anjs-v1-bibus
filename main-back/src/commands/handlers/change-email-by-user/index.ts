@@ -1,12 +1,13 @@
+import { knexConnection } from "apps/main/database";
 import { TempToken, TempTokenId } from "commands/models/temp-token";
 import { TempTokenDataService } from "commands/models/temp-token/ds";
 import { UserId } from "commands/models/user";
 import { UserEmail } from "commands/models/user-email";
 import { UserEmailDataService } from "commands/models/user-email/ds";
 import { makeUserEmailNotMainDBQuery } from "commands/operations/user-management/make-user-email-not-main";
-import { knexConnection } from "database";
-import { Email } from "utils/branded-types";
-import { Command } from "utils/cqrs";
+
+import { Email } from "src/libs/branded-types";
+import { Command } from "src/libs/cqrs";
 
 // // CLASS VALIDATION
 // class ChangeEmailByUserCommandData {
