@@ -1,6 +1,7 @@
 import { Knex } from "knex";
 import { Query } from "libs/cqrs";
 import { QueryResult } from "pg";
+import { GetUserQueryNotFoundError } from "queries/handlers/get-user/errors";
 
 import {
   SuccessResponse,
@@ -33,7 +34,7 @@ export type GetUserQueryResult = SuccessResponseR<{
 }>;
 
 export const getUserQueryHandlerC =
-  (knexConnection: Knex) =>
+  (knex: Knex) =>
   async (query: GetUserQuery): Promise<GetUserQueryResult> => {
     // // ORM
     // const result = await User.findOne({
@@ -65,7 +66,7 @@ export const getUserQueryHandlerC =
     // const userEmailTableAlias = "ue"
     // const registrationDateColumnName = "registration_date"
     // const emailDateColumnName = "email"
-    // const query = knexConnection
+    // const query = knex
     //   .select(
     //     `${userTableAlias}.${UserTableColumnNames.id}`,
     //     `${userTableAlias}.${UserTableColumnNames.role}`,
@@ -98,7 +99,7 @@ export const getUserQueryHandlerC =
     const userEmailTableAlias = "ue";
     const registrationDateColumnName = "registration_date";
     const emailDateColumnName = "email";
-    const result = await knexConnection.raw<
+    const result = await knex.raw<
       QueryResult<{
         id: UserTableId;
         role: UserTableRole;
@@ -122,7 +123,7 @@ export const getUserQueryHandlerC =
     const user = result.rows[0];
 
     if (!user) {
-      throw new Error(`There is no user with this id`);
+      throw new GetUserQueryNotFoundError(query.data.userId);
     }
 
     return SuccessResponse.create(query.meta.transactionId, {

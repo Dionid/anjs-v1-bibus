@@ -2,12 +2,12 @@ import { knexConnection } from "apps/main/database";
 import { TempToken, TempTokenId } from "commands/models/temp-token";
 import { TempTokenDataService } from "commands/models/temp-token/ds";
 import { UserId } from "commands/models/user";
+import { UserDataService } from "commands/models/user-di";
 import { UserEmail } from "commands/models/user-email";
 import { UserEmailDataService } from "commands/models/user-email/ds";
 import { makeUserEmailNotMainDBQuery } from "commands/operations/user-management/make-user-email-not-main";
-
-import { Email } from "src/libs/branded-types";
-import { Command } from "src/libs/cqrs";
+import { Email } from "libs/branded-types";
+import { Command } from "libs/cqrs";
 
 // // CLASS VALIDATION
 // class ChangeEmailByUserCommandData {
@@ -63,28 +63,28 @@ export type ChangeEmailByUserCommand = Command<
   ChangeEmailByUserCommandData
 >;
 
-export const changeEmailByUserCommandHandler = async (
-  command: ChangeEmailByUserCommand
-): Promise<void> => {
-  const { newEmail, userIdToChangeEmail } = command.data;
+export const changeEmailByUserCommandHandler =
+  (userDataService: UserDataService) =>
+  async (command: ChangeEmailByUserCommand): Promise<void> => {
+    const { newEmail, userIdToChangeEmail } = command.data;
 
-  // . Make main email not main
-  await makeUserEmailNotMainDBQuery(knexConnection, userIdToChangeEmail);
+    // . Make main email not main
+    await makeUserEmailNotMainDBQuery(knexConnection, userIdToChangeEmail);
 
-  // . Create new email
-  const newUserEmail: UserEmail = UserEmail.newMainNotActivated(
-    userIdToChangeEmail,
-    newEmail
-  );
-  await UserEmailDataService.insert(knexConnection, newUserEmail);
+    // . Create new email
+    const newUserEmail: UserEmail = UserEmail.newMainNotActivated(
+      userIdToChangeEmail,
+      newEmail
+    );
+    await UserEmailDataService.insert(knexConnection, newUserEmail);
 
-  // . Create new temp token
-  const token: TempToken = {
-    id: TempTokenId.new(),
-    used: false,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    userEmailId: newUserEmail.id,
+    // . Create new temp token
+    const token: TempToken = {
+      id: TempTokenId.new(),
+      used: false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      userEmailId: newUserEmail.id,
+    };
+    await TempTokenDataService.insert(knexConnection, token);
   };
-  await TempTokenDataService.insert(knexConnection, token);
-};

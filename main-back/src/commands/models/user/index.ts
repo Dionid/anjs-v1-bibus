@@ -1,6 +1,5 @@
+import { Switch } from "libs/switch";
 import { v4, validate } from "uuid";
-
-import { Switch } from "src/libs/switch";
 
 import {
   UserTable,
