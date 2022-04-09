@@ -3,6 +3,7 @@ import { UserEmail } from "commands/models/user-email";
 import { getUserMainEmail } from "commands/operations/user-management/get-user-main-email";
 
 export const activateMainEmail = async (
+  // ...
   mainEmail: UserEmail
   // ...
 ): Promise<void> => {

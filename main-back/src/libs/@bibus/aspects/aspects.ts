@@ -1,8 +1,8 @@
-import { logger } from "apps/main/logger";
-
-import { CommandOrQuery, CommandQueryHandler } from "src/libs/cqrs";
+import { CommandOrQuery, CommandQueryHandler } from "libs/cqrs";
+import pino from "pino";
 
 export const loggerAspect =
+  (logger: pino.Logger) =>
   <Type extends string, Data extends Record<string, any>, R>(
     cqHandler: CommandQueryHandler<CommandOrQuery<Type, Data, R>>
   ) =>
@@ -34,10 +34,9 @@ export const isAuthenticatedAspect =
 
 export const debugAspect = loggerAspect;
 
-export const debugAndIsAuthNAspect = <
-  Type extends string,
-  Data extends Record<string, any>,
-  R
->(
-  cqHandler: CommandQueryHandler<CommandOrQuery<Type, Data, R>>
-) => debugAspect(isAuthenticatedAspect(cqHandler));
+export const debugAndIsAuthNAspect =
+  (logger: pino.Logger) =>
+  <Type extends string, Data extends Record<string, any>, R>(
+    cqHandler: CommandQueryHandler<CommandOrQuery<Type, Data, R>>
+  ) =>
+    debugAspect(logger)(isAuthenticatedAspect(cqHandler));

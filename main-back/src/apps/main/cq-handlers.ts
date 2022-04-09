@@ -1,13 +1,9 @@
-import { debugAndIsAuthNAspect } from "apps/main/aspects";
 import {
   ChangeEmailByUserCommand,
   changeEmailByUserCommandHandler,
 } from "commands/handlers/change-email-by-user";
 import { UserEmail } from "commands/models/user-email";
-import { getUserQueryHandler } from "queries/handlers/get-user";
-
-export const getUserQueryHandlerWithAspects =
-  debugAndIsAuthNAspect(getUserQueryHandler);
+import { debugAndIsAuthNAspect } from "libs/@bibus/aspects/aspects";
 
 export const changeEmailByUserCommandHandlerWithAspects = debugAndIsAuthNAspect(
   async (command: ChangeEmailByUserCommand): Promise<void> => {

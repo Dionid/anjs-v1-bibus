@@ -1,10 +1,9 @@
-import { getUserQueryHandlerWithAspects } from "apps/main/cq-handlers";
-import { QueryResolvers } from "apps/main/gql/gqlgen-types";
-import { ResolversCtx } from "apps/main/gql/resolver-ctx";
+import { QueryResolvers } from "apps/krusa/gql/gqlgen-types";
+import { ResolversCtx } from "apps/krusa/gql/resolver-ctx";
 
 export const Query: QueryResolvers<ResolversCtx> = {
   getUser: async (parent, args, ctx) => {
-    const qResult = await getUserQueryHandlerWithAspects({
+    const qResult = await ctx.cqHandlers.getUserQueryHandler({
       type: "GetUserQuery",
       data: {
         userId: args.userId,
