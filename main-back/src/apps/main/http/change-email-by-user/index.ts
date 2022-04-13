@@ -6,8 +6,7 @@ import {
 import { UserId } from "commands/models/user";
 import { FastifyInstance } from "fastify";
 import { FromSchema } from "json-schema-to-ts";
-
-import { Email } from "src/libs/branded-types";
+import { Email } from "libs/branded-types";
 
 import {
   SuccessResponse,

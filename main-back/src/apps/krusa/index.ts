@@ -1,7 +1,25 @@
+// eslint-disable-next-line import/order
+import dotenv from "dotenv";
+
+dotenv.config();
+
+// eslint-disable-next-line import/order
+import { initTracing } from "apps/krusa/tracing";
+
+initTracing({
+  consoleTracerEnabled: !!process.env.CONSOLE_TRACER_ENABLED,
+  tracingEnabled: !!process.env.TRACING_ENABLED,
+  serviceName: process.env.SERVICE_NAME || "krusa",
+  env: process.env.NODE_ENV,
+  serviceVersion: process.env.SERVICE_VERSION,
+});
+
 import { ApolloServer } from "apollo-server";
+import { ApolloServerPlugin } from "apollo-server-plugin-base";
 import { initConfig } from "apps/krusa/config";
 import { ResolversCtx } from "apps/krusa/gql/resolver-ctx";
 import { schema } from "apps/krusa/gql/shema";
+import { gracefulShutdownC } from "apps/krusa/graceful-shutdown";
 import { JwtToken } from "commands/models/jwt-token";
 import { GraphQLError } from "graphql";
 import knex from "knex";
@@ -9,6 +27,7 @@ import { debugAndIsAuthNAspect } from "libs/@bibus/aspects/aspects";
 import { initLogger, pinoLogger } from "libs/@bibus/logger";
 import { JwtTokenSessionExpired } from "libs/@bibus/typed-errors";
 import { JWTToken } from "libs/jwt-tokens";
+import { ReactiveCounter } from "libs/reactive-counter";
 import {
   BaseError,
   ERRORS,
@@ -26,6 +45,9 @@ const main = async () => {
 
   // . LOGGER
   const logger = initLogger(config);
+
+  // . REACTIVE COUNTER
+  const reactiveCounter = ReactiveCounter.new();
 
   // . DB
   const knexConnection = knex({
@@ -124,11 +146,33 @@ const main = async () => {
         },
       };
     },
+    plugins: [
+      {
+        requestDidStart: async () => {
+          reactiveCounter.increment();
+
+          return {
+            willSendResponse: async (ctx) => {
+              reactiveCounter.decrement();
+            },
+          };
+        },
+      } as ApolloServerPlugin<ResolversCtx>,
+    ],
     introspection: true,
   });
 
   gqlApp.listen({ port: config.gql.port, host: "0.0.0.0" }).then(({ url }) => {
     logger.info(`🚀  NEW Server ready at ${url}`);
+  });
+
+  const gracefulShutdown = gracefulShutdownC(knexConnection, reactiveCounter);
+
+  process.on("SIGINT", () => {
+    gracefulShutdown("SIGINT");
+  });
+  process.on("SIGTERM", () => {
+    gracefulShutdown("SIGTERM");
   });
 };
 
