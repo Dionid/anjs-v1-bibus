@@ -1,7 +1,9 @@
+import path from "path";
+
 // eslint-disable-next-line import/order
 import dotenv from "dotenv";
 
-dotenv.config();
+dotenv.config({ path: path.join(process.cwd(), "src/apps/krusa/.env") });
 
 // eslint-disable-next-line import/order
 import { initTracing } from "apps/krusa/tracing";

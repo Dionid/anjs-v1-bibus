@@ -61,14 +61,14 @@
     "uuid": "^8.3.2"
   },
   "scripts": {
-    "start": "NODE_PATH=./build node build/apps/main-gql/index.js",
+    "start": "NODE_PATH=./build node --enable-source-maps build/apps/main-gql/index.js",
     "test": "jest --passWithNoTests",
-    "introspect": "NODE_TLS_REJECT_UNAUTHORIZED=0 env-cmd -f ./.env introspect-it > src/libs/@bibus/the-king/introspect-it-schema.ts",
-    "gql:gen": "graphql-codegen --config codegen.yaml",
-    "build": "rimraf build && npm run introspect && npm run gql:gen && tsc -P tsconfig.build.json",
-    "dev:mvc": "npm run build && NODE_PATH=./build node build/index.js",
-    "dev:commander": "npm run build && NODE_PATH=./build node build/apps/commander/index.js",
-    "dev:krusa": "npm run build && NODE_PATH=./build node build/apps/krusa/index.js"
+    "introspect": "NODE_TLS_REJECT_UNAUTHORIZED=0 env-cmd -f src/apps/krusa/.env introspect-it > src/libs/@bibus/the-king/introspect-it-schema.ts",
+    "gen:gql": "graphql-codegen --config codegen.yaml",
+    "build:commander": "rimraf build && npm run introspect && tsc -P tsconfig.build.json",
+    "build:krusa": "rimraf build && npm run introspect && npm run gen:gql && tsc -P tsconfig.build.json",
+    "dev:commander": "npm run build:commander && NODE_PATH=./build node build/apps/commander/index.js",
+    "dev:krusa": "npm run build:krusa && NODE_PATH=./build node build/apps/krusa/index.js"
   },
   "jest": {
     "testEnvironment": "node",
