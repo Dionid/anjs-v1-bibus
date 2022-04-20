@@ -72,7 +72,7 @@
   },
   "jest": {
     "testEnvironment": "node",
-    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.ts$",
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(unit|int).ts$",
     "moduleFileExtensions": [
       "js",
       "json",
@@ -81,7 +81,9 @@
     "moduleNameMapper": {
       "^modules/(.*)$": "<rootDir>/src/modules/$1",
       "^apps/(.*)$": "<rootDir>/src/apps/$1",
-      "^libs/(.*)$": "<rootDir>/src/libs/$1"
+      "^libs/(.*)$": "<rootDir>/src/libs/$1",
+      "^commands/(.*)$": "<rootDir>/src/commands/$1",
+      "^queries/(.*)$": "<rootDir>/src/queries/$1"
     },
     "preset": "ts-jest",
     "collectCoverage": true,
@@ -95,9 +97,6 @@
         "diagnostics": true
       }
     }
-  },
-  "resolutions": {
-    "schemats/pg-promise": "10.5.2"
   },
   "engines": {
     "node": "16.x"

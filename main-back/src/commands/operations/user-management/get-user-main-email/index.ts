@@ -1,7 +1,7 @@
-import { User } from "commands/models/user";
+import { UserEmail } from "commands/models/user-email";
 
-export const getUserMainEmail = (user: User) => {
-  return user.emails.find((email) => email.main);
+export const getUserMainEmail = (userEmails: UserEmail[]) => {
+  return userEmails.find((email) => email.main);
 };
 
 // export const getUserMainEmailFromDB = (

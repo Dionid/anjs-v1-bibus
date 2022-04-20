@@ -1,7 +1,6 @@
 import { UserId } from "commands/models/user";
+import { Email } from "libs/branded-types";
 import { v4, validate } from "uuid";
-
-import { Email } from "src/libs/branded-types";
 
 import { UserEmailTable } from "../../../libs/@bibus/the-king/introspect-it-schema";
 

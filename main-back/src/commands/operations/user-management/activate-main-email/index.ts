@@ -1,31 +1,30 @@
-import { User } from "commands/models/user";
 import { UserEmail } from "commands/models/user-email";
-import { getUserMainEmail } from "commands/operations/user-management/get-user-main-email";
+import { pinoLogger } from "libs/@bibus/logger";
+import { InternalError } from "libs/typed-errors";
 
-export const activateMainEmail = async (
-  // ...
-  mainEmail: UserEmail
-  // ...
-): Promise<void> => {
+export class EmailIsNotMain extends InternalError {
+  constructor(id: string) {
+    super(`Email with id ${id} must be main`);
+  }
+}
+
+export const activateMainEmail = (mainEmail: UserEmail): void => {
   if (!mainEmail.main) {
-    throw new Error(`...`);
+    throw new EmailIsNotMain(mainEmail.id);
   }
 
-  if (!mainEmail.state.activated) {
-    mainEmail.state.activated = true;
-    await mainEmail.state.save();
+  switch (mainEmail.state.__type) {
+    case "UserEmailStateEmpty":
+      throw new InternalError(`Email must not be empty`);
+    case "UserEmailStateActivated":
+      pinoLogger.info(`Email %s already activated`, mainEmail.id);
+
+      return;
+    case "UserEmailStateInactivated":
+      mainEmail.state = {
+        __type: "UserEmailStateActivated",
+        activated: true,
+        value: mainEmail.state.value,
+      };
   }
-};
-
-export const activateMainEmailFromUser = async (
-  user: User
-  // ...
-): Promise<void> => {
-  const mainEmail = getUserMainEmail(user);
-
-  if (!mainEmail) {
-    throw new Error(`Must exust`);
-  }
-
-  return activateMainEmail(mainEmail);
 };
