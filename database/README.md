@@ -1,15 +1,25 @@
 # DB Migrations
 
-> Full information on [Notion](https://www.notion.so/yuccadigital/Migrations-aea7924de34a40158023d6d7ac3d40b8)
-
 ```shell
-# create migrations
+# create schema-migrations
 npx db-migrate create MIGRATION_NAME --sql-file
 
-# run migrations
+# run schema-migrations
 npx db-migrate up
 
 # chose environment
 npx db-migrate up -e local
 npx db-migrate up -e review-db
 ```
+
+# CI/CD
+
+1. Build
+   1. Apps
+   2. Migrations
+2. Scale down
+3. Migration up
+4. Success
+   1. Scale up new version
+5. Failure
+   1. Manually

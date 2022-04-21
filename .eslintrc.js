@@ -154,7 +154,12 @@ module.exports = {
   },
   overrides: [
     Object.assign(require("eslint-plugin-jest").configs.recommended, {
-      files: ["__tests__", "**/*.spec.ts", "**/*.spec.tsx", "**/*.test.ts"],
+      files: [
+        "__tests__",
+        "**/*.spec.ts",
+        "**/*.spec.tsx",
+        "**/*.test.unit.ts",
+      ],
       env: {
         jest: true,
       },

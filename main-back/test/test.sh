@@ -1,0 +1,3 @@
+docker-compose up
+...
+cd .. && npm run test:int

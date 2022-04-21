@@ -9,15 +9,6 @@
     "port": "5432",
     "schema": "public"
   },
-  "review-db": {
-    "driver": "pg",
-    "user": { "ENV": "POSTGRES_USER" },
-    "password": { "ENV": "POSTGRES_PASSWORD" },
-    "host": { "ENV": "POSTGRES_HOST" },
-    "database": "bit-monitoring-review",
-    "port": "5432",
-    "schema": "public"
-  },
   "dynamic-db": {
     "driver": "pg",
     "user": { "ENV": "POSTGRES_USER" },

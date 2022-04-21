@@ -4,7 +4,7 @@ WORKDIR /app
 
 RUN yarn add db-migrate db-migrate-pg
 
-COPY ./migrations ./migrations
+COPY schema-migrations ./migrations
 COPY ./database.json .
 COPY .db-migraterc .
 
