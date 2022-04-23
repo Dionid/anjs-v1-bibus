@@ -1,5 +1,9 @@
-import { User, UserDataService, UserId } from "commands/models/user-di";
 import { Knex } from "knex";
+import {
+  User,
+  UserDataService,
+  UserId,
+} from "modules/user-management/commands/models/user-di";
 
 export const PgUserDataService = (knex: Knex): UserDataService => {
   return {

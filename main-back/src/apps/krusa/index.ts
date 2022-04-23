@@ -22,7 +22,6 @@ import { initConfig } from "apps/krusa/config";
 import { ResolversCtx } from "apps/krusa/gql/resolver-ctx";
 import { schema } from "apps/krusa/gql/shema";
 import { gracefulShutdownC } from "apps/krusa/graceful-shutdown";
-import { JwtToken } from "commands/models/jwt-token";
 import { GraphQLError } from "graphql";
 import knex from "knex";
 import { debugAndIsAuthNAspect } from "libs/@bibus/aspects/aspects";
@@ -37,8 +36,9 @@ import {
   NotFoundError,
   PublicError,
 } from "libs/typed-errors";
-import { getUserQueryHandlerC } from "queries/handlers/get-user";
-import { GetUserQueryNotFoundError } from "queries/handlers/get-user/errors";
+import { JwtToken } from "modules/user-management/commands/models/jwt-token";
+import { getUserQueryHandlerC } from "modules/user-management/queries/handlers/external/get-user";
+import { GetUserQueryNotFoundError } from "modules/user-management/queries/handlers/external/get-user/errors";
 import { v4 } from "uuid";
 
 const main = async () => {

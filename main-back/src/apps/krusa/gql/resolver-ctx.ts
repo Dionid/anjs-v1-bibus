@@ -1,5 +1,5 @@
 import { CommandQueryHandler } from "libs/cqrs";
-import { GetUserQuery } from "queries/handlers/get-user";
+import { GetUserQuery } from "modules/user-management/queries/handlers/external/get-user";
 
 export type ResolversCtx = {
   reqId: string;
