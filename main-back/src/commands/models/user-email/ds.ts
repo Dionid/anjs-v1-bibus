@@ -6,7 +6,7 @@ import {
 } from "commands/models/user-email/index";
 import { Knex } from "knex";
 
-import { Email } from "src/libs/branded-types";
+import { Email } from "/libs/branded-types";
 
 import {
   UserEmailTable,

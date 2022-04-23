@@ -1,6 +1,6 @@
-import { ExceptionCommand } from "src/libs/cqrs";
+import { SuccessResponseR } from "libs/@bibus/responses";
 
-import { SuccessResponseR } from "../../../libs/@bibus/responses";
+import { ExceptionCommand } from "/libs/cqrs";
 
 export type LoginExceptionCommand = ExceptionCommand<
   "LoginExceptionCommand",

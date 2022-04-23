@@ -1,11 +1,10 @@
-import { knexConnection } from "apps/main/database";
 import { TempToken, TempTokenId } from "commands/models/temp-token";
 import { TempTokenDataService } from "commands/models/temp-token/ds";
 import { UserId } from "commands/models/user";
-import { UserDataService } from "commands/models/user-di";
 import { UserEmail } from "commands/models/user-email";
 import { UserEmailDataService } from "commands/models/user-email/ds";
 import { makeUserEmailNotMainDBQuery } from "commands/operations/user-management/make-user-email-not-main";
+import { Knex } from "knex";
 import { Email } from "libs/branded-types";
 import { Command } from "libs/cqrs";
 
@@ -64,19 +63,20 @@ export type ChangeEmailByUserCommand = Command<
 >;
 
 export const changeEmailByUserCommandHandler =
-  (userDataService: UserDataService) =>
+  (knex: Knex) =>
   async (command: ChangeEmailByUserCommand): Promise<void> => {
     const { newEmail, userIdToChangeEmail } = command.data;
 
     // . Make main email not main
-    await makeUserEmailNotMainDBQuery(knexConnection, userIdToChangeEmail);
+    await makeUserEmailNotMainDBQuery(knex, userIdToChangeEmail);
+    // await makeUserBlablabla(knex, userIdToChangeEmail);
 
     // . Create new email
     const newUserEmail: UserEmail = UserEmail.newMainNotActivated(
       userIdToChangeEmail,
       newEmail
     );
-    await UserEmailDataService.insert(knexConnection, newUserEmail);
+    await UserEmailDataService.insert(knex, newUserEmail);
 
     // . Create new temp token
     const token: TempToken = {
@@ -86,5 +86,5 @@ export const changeEmailByUserCommandHandler =
       updatedAt: new Date(),
       userEmailId: newUserEmail.id,
     };
-    await TempTokenDataService.insert(knexConnection, token);
+    await TempTokenDataService.insert(knex, token);
   };

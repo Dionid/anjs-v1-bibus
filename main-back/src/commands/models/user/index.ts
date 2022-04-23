@@ -1,10 +1,9 @@
-import { Switch } from "libs/switch";
-import { v4, validate } from "uuid";
-
 import {
   UserTable,
   UserTableRole,
-} from "../../../libs/@bibus/the-king/introspect-it-schema";
+} from "libs/@bibus/the-king/introspect-it-schema";
+import { Switch } from "libs/switch";
+import { v4, validate } from "uuid";
 
 export type UserId = string & { readonly UserId: unique symbol };
 export const UserId = {

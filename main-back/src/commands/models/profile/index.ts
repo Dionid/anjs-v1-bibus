@@ -1,6 +1,6 @@
 import { UserId } from "commands/models/user";
 
-import { createEntityStringId } from "src/libs/branded-types";
+import { createEntityStringId } from "/libs/branded-types";
 
 import { ProfileTable } from "../../../libs/@bibus/the-king/introspect-it-schema";
 
