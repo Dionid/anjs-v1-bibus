@@ -8,14 +8,15 @@ import { makeUserEmailNotMainDBQuery } from "commands/operations/user-management
 import { mock, MockProxy } from "jest-mock-extended";
 import { Knex } from "knex";
 import { Email } from "libs/branded-types";
-import { mocked } from "ts-jest/utils";
 import { v4 } from "uuid";
 
 jest.mock("commands/operations/user-management/make-user-email-not-main");
-const makeUserEmailNotMainDBQueryMocked = mocked(makeUserEmailNotMainDBQuery);
+const makeUserEmailNotMainDBQueryMocked = jest.mocked(
+  makeUserEmailNotMainDBQuery
+);
 
 jest.mock("commands/models/user-email/ds");
-const UserEmailDataServiceMocked = mocked(UserEmailDataService);
+const UserEmailDataServiceMocked = jest.mocked(UserEmailDataService);
 
 describe("changeEmailByUserCommandHandler", () => {
   let knexConnection: MockProxy<Knex>;
@@ -48,12 +49,11 @@ describe("changeEmailByUserCommandHandler", () => {
         userIdToChangeEmail,
       },
     };
-    await changeEmailByUserCommandHandler(knexConnection)(command);
 
     makeUserEmailNotMainDBQueryMocked.mockImplementation(
       async (knex, userId) => {
         expect(knex).toBe(knexConnection);
-        expect(userId).toBe(UserId.new());
+        expect(userId).toBe(userIdToChangeEmail);
       }
     );
 
@@ -64,6 +64,8 @@ describe("changeEmailByUserCommandHandler", () => {
         expect(userEmail.userId).toBe(userIdToChangeEmail);
       }
     );
+
+    await changeEmailByUserCommandHandler(knexConnection)(command);
 
     expect(makeUserEmailNotMainDBQueryMocked).toBeCalledTimes(1);
   });
