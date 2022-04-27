@@ -1,9 +1,14 @@
 import { ForbiddenError } from "apollo-server";
 import { Knex } from "knex";
 import { Command, CommandQueryHandler } from "libs/cqrs";
-import { PaymentCurrency } from "modules/babosiki/commands/models/payment";
+import {
+  Payment,
+  PaymentCurrency,
+  PaymentId,
+} from "modules/babosiki/commands/models/payment";
+import { PaymentDS } from "modules/babosiki/commands/models/payment/ds";
+import { UpdateUserLastPaymentDateCommand } from "modules/user-management/commands/handlers/internal/update-user-last-payment-date";
 import { UserId } from "modules/user-management/commands/models/user";
-import { UserDataService } from "modules/user-management/commands/models/user/ds";
 import { GetInternalUserQuery } from "modules/user-management/queries/handlers/internal/get-user";
 import { v4 } from "uuid";
 
@@ -20,10 +25,11 @@ export const createPaymentCommandHandlerC =
   (
     knex: Knex,
     serviceUserId: string,
-    getInternalUser: CommandQueryHandler<GetInternalUserQuery>
+    getInternalUser: CommandQueryHandler<GetInternalUserQuery>,
+    updateUserLastPaymentDate: CommandQueryHandler<UpdateUserLastPaymentDateCommand>
   ) =>
   async (command: CreatePaymentCommand) => {
-    const { payerId } = command.data;
+    const { payerId, currency, sum } = command.data;
 
     const payer = await getInternalUser({
       type: "GetInternalUserQuery",
@@ -42,14 +48,24 @@ export const createPaymentCommandHandlerC =
       throw new ForbiddenError(`...`);
     }
 
-    // const payment: Payment = {
-    //   id: PaymentId.new(),
-    //   currency,
-    //   sum,
-    //   userId: payerId,
-    // };
-    // PaymentDS.insert(knex, payment)
+    const payment: Payment = {
+      id: PaymentId.new(),
+      currency,
+      sum,
+      userId: payerId,
+    };
+    await PaymentDS.insert(knex, payment);
 
-    payer.lastPaymentDate = new Date();
-    await UserDataService.update(knex, payer);
+    updateUserLastPaymentDate({
+      type: "UpdateUserLastPaymentDateCommand",
+      meta: {
+        transactionId: v4(),
+        createdAt: new Date(),
+        userId: serviceUserId,
+        parentTransactionId: command.meta.transactionId,
+      },
+      data: {
+        userId: payer.result.id,
+      },
+    });
   };

@@ -19,6 +19,7 @@ export const UserDataMapper = {
       ...userTable,
       role: UserRole.ofUserTableRole(userTable.role),
       id: userTable.id as UserId,
+      lastPaymentDate: new Date(),
     };
   },
 };

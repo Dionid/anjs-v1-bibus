@@ -5,12 +5,12 @@ import {
   UserEmailTableName,
   UserEmailTableValue,
   UserTableColumnNames,
-  UserTableId,
   UserTableName,
   UserTableRole,
 } from "libs/@bibus/the-king/introspect-it-schema";
 import { Query } from "libs/cqrs";
 import { NotFoundError } from "libs/typed-errors";
+import { UserId } from "modules/user-management/commands/models/user";
 import { QueryResult } from "pg";
 
 export type GetInternalUserQuery = Query<
@@ -22,7 +22,7 @@ export type GetInternalUserQuery = Query<
 >;
 
 export type GetInternalUserQueryResult = SuccessResponseR<{
-  id: string;
+  id: UserId;
   role: UserTableRole;
   email: string | null;
 }>;
@@ -36,7 +36,7 @@ export const getUserQueryHandlerC =
     const emailDateColumnName = "email";
     const result = await knex.raw<
       QueryResult<{
-        id: UserTableId;
+        id: UserId;
         role: UserTableRole;
         email: UserEmailTableValue;
       }>

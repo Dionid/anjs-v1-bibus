@@ -34,7 +34,7 @@ export const isAuthenticatedAspect =
 
 export const debugAspect = loggerAspect;
 
-export const debugAndIsAuthNAspect =
+export const debugAndIsAuthNAspectC =
   (logger: pino.Logger) =>
   <Type extends string, Data extends Record<string, any>, R>(
     cqHandler: CommandQueryHandler<CommandOrQuery<Type, Data, R>>

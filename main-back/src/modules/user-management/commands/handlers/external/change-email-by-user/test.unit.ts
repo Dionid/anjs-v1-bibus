@@ -4,7 +4,7 @@ import { Email } from "libs/branded-types";
 import {
   ChangeEmailByUserCommand,
   changeEmailByUserCommandHandler,
-} from "modules/user-management/commands/handlers/change-email-by-user/index";
+} from "modules/user-management/commands/handlers/external/change-email-by-user/index";
 import { UserId } from "modules/user-management/commands/models/user";
 import { UserEmailDataService } from "modules/user-management/commands/models/user-email/ds";
 import { makeUserEmailNotMainDBQuery } from "modules/user-management/commands/operations/user-management/make-user-email-not-main";
