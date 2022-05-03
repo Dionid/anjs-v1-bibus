@@ -1,8 +1,10 @@
 import { ForbiddenError } from "apollo-server";
 import { Knex } from "knex";
 import { Command, CommandQueryHandler } from "libs/cqrs";
+import { Event, EventBus, EventFactory } from "libs/eda";
 import {
   Payment,
+  PaymentCreatedEvent,
   PaymentCurrency,
   PaymentId,
 } from "modules/babosiki/commands/models/payment";
@@ -21,9 +23,20 @@ export type CreatePaymentCommand = Command<
   }
 >;
 
+export type CreatePaymentSuccededEvent = Event<
+  "CreatePaymentSucceded",
+  {
+    paymentId: PaymentId;
+  },
+  "v1"
+>;
+export const CreatePaymentSuccededEvent =
+  EventFactory.new<CreatePaymentSuccededEvent>("CreatePaymentSucceded", "v1");
+
 export const createPaymentCommandHandlerC =
   (
     knex: Knex,
+    eventBus: EventBus,
     serviceUserId: string,
     getInternalUser: CommandQueryHandler<GetInternalUserQuery>,
     updateUserLastPaymentDate: CommandQueryHandler<UpdateUserLastPaymentDateCommand>
@@ -56,16 +69,48 @@ export const createPaymentCommandHandlerC =
     };
     await PaymentDS.insert(knex, payment);
 
-    updateUserLastPaymentDate({
-      type: "UpdateUserLastPaymentDateCommand",
-      meta: {
-        transactionId: v4(),
-        createdAt: new Date(),
-        userId: serviceUserId,
-        parentTransactionId: command.meta.transactionId,
+    // ASYNC COMMUNICATION
+    await eventBus.publish([
+      {
+        name: "CreatePaymentSucceded",
+        data: {
+          paymentId: payment.id,
+        },
+        meta: {
+          id: v4(),
+          version: "v1",
+          transactionId: command.meta.transactionId,
+          userId: command.meta.userId,
+        },
       },
-      data: {
-        userId: payer.result.id,
-      },
-    });
+      CreatePaymentSuccededEvent.new(
+        {
+          paymentId: payment.id,
+        },
+        {
+          id: v4(),
+          transactionId: command.meta.transactionId,
+          userId: command.meta.userId,
+        }
+      ),
+      PaymentCreatedEvent.new(payment, {
+        id: v4(),
+        transactionId: command.meta.transactionId,
+        userId: command.meta.userId,
+      }),
+    ]);
+
+    // // SYNC COMMUNICATION
+    // await updateUserLastPaymentDate({
+    //   type: "UpdateUserLastPaymentDateCommand",
+    //   meta: {
+    //     transactionId: v4(),
+    //     createdAt: new Date(),
+    //     userId: serviceUserId,
+    //     parentTransactionId: command.meta.transactionId,
+    //   },
+    //   data: {
+    //     userId: payer.result.id,
+    //   },
+    // });
   };

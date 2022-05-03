@@ -1,3 +1,4 @@
+import { Event, EventFactory } from "libs/eda";
 import { Switch } from "libs/switch";
 import { UserId } from "modules/user-management/commands/models/user";
 import { v4, validate } from "uuid";
@@ -40,3 +41,16 @@ export type Payment = {
   sum: number;
   currency: PaymentCurrency;
 };
+
+export type PaymentCreatedEvent = Event<"PaymentCreatedEvent", Payment, "v1">;
+export const PaymentCreatedEvent = EventFactory.new<PaymentCreatedEvent>(
+  "PaymentCreatedEvent",
+  "v1"
+);
+
+export type PaymentUpdatedEvent = Event<"PaymentUpdatedEvent", Payment, "v1">;
+export type PaymentDeletedEvent = Event<
+  "PaymentDeletedEvent",
+  { id: PaymentId },
+  "v1"
+>;
