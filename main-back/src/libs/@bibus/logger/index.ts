@@ -19,6 +19,7 @@ export const initLogger = (config: LoggerConfig) => {
     },
   });
 
+  pinoLogger.info = pinoLogger.info.bind(pinoLogger);
   pinoLogger.debug = pinoLogger.debug.bind(pinoLogger);
   pinoLogger.warn = pinoLogger.warn.bind(pinoLogger);
   pinoLogger.error = pinoLogger.error.bind(pinoLogger);

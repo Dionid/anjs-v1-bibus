@@ -4,6 +4,7 @@ import Fastify, { FastifyInstance } from "fastify";
 import fastifySwagger from "fastify-swagger";
 import { Knex } from "knex";
 import { CommandQueryHandler } from "libs/cqrs";
+import { EventBus } from "libs/eda";
 import { JWTToken as JWTTokenUtils } from "libs/jwt-tokens";
 import { CreatePaymentCommand } from "modules/babosiki/commands/handlers/create-payment";
 import { JwtToken } from "modules/user-management/commands/models/jwt-token";
@@ -14,6 +15,8 @@ declare module "fastify" {
   interface FastifyRequest {
     userId?: string;
     ctx: {
+      txEventBus?: EventBus;
+      txTheKingKnexConnection?: Knex.Transaction;
       babosiki: {
         commands: {
           createPaymentCommandHandler: CommandQueryHandler<CreatePaymentCommand>;
@@ -42,7 +45,8 @@ export const initFastifyApp = (
   },
   logger: pino.Logger,
   createPaymentCommandHandler: CommandQueryHandler<CreatePaymentCommand>,
-  theKingKnexConnection: Knex
+  theKingKnexConnection: Knex,
+  eventBus: EventBus
 ) => {
   const app: FastifyInstance = Fastify({
     logger: config.logger.active && logger,
@@ -83,19 +87,46 @@ export const initFastifyApp = (
       requestId: request.id,
     });
 
+    const txEventBus = eventBus.tx();
+    const txTheKingKnexConnection = await theKingKnexConnection.transaction();
+
     const cqHandlers = initCQHandlers(
       onRequestLogger,
       config,
-      theKingKnexConnection
+      txTheKingKnexConnection,
+      txEventBus
     );
 
+    // eslint-disable-next-line require-atomic-updates
     request.ctx = {
+      txEventBus,
+      txTheKingKnexConnection,
       babosiki: {
         commands: {
           createPaymentCommandHandler: cqHandlers.createPaymentCommandHandler,
         },
       },
     };
+  });
+
+  app.addHook("onError", async (request) => {
+    if (request.ctx.txEventBus) {
+      await request.ctx.txEventBus.rollback();
+    }
+
+    if (request.ctx.txTheKingKnexConnection) {
+      await request.ctx.txTheKingKnexConnection.rollback();
+    }
+  });
+
+  app.addHook("onResponse", async (request) => {
+    if (request.ctx.txEventBus) {
+      await request.ctx.txEventBus.commit();
+    }
+
+    if (request.ctx.txTheKingKnexConnection) {
+      await request.ctx.txTheKingKnexConnection.commit();
+    }
   });
 
   // . AUTHENTICATED

@@ -1,5 +1,6 @@
 import { Knex } from "knex";
 import { debugAndIsAuthNAspectC } from "libs/@bibus/aspects/aspects";
+import { EventBus } from "libs/eda";
 import { createPaymentCommandHandlerC } from "modules/babosiki/commands/handlers/create-payment";
 import { updateUserLastPaymentDateCommandHandlerC } from "modules/user-management/commands/handlers/internal/update-user-last-payment-date";
 import { getUserQueryHandlerC } from "modules/user-management/queries/handlers/internal/get-user";
@@ -14,7 +15,8 @@ export const initCQHandlers = (
       userId: string;
     };
   },
-  theKingKnexConnection: Knex
+  theKingKnexConnection: Knex,
+  eventBus: EventBus
 ) => {
   // . ASPECTS
   const debugAndIsAuthNAspect = debugAndIsAuthNAspectC(logger);
@@ -29,6 +31,7 @@ export const initCQHandlers = (
   const createPaymentCommandHandler = debugAndIsAuthNAspect(
     createPaymentCommandHandlerC(
       theKingKnexConnection,
+      eventBus,
       config.service.userId,
       getInternalUser,
       updateUserLastPaymentDate
