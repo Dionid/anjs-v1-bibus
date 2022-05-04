@@ -83,12 +83,11 @@ export const initFastifyApp = (
   app.decorateRequest("userId", "");
 
   app.addHook("onRequest", async (request) => {
+    const txEventBus = eventBus.tx();
+    const txTheKingKnexConnection = await theKingKnexConnection.transaction();
     const onRequestLogger = logger.child({
       requestId: request.id,
     });
-
-    const txEventBus = eventBus.tx();
-    const txTheKingKnexConnection = await theKingKnexConnection.transaction();
 
     const cqHandlers = initCQHandlers(
       onRequestLogger,
@@ -97,7 +96,6 @@ export const initFastifyApp = (
       txEventBus
     );
 
-    // eslint-disable-next-line require-atomic-updates
     request.ctx = {
       txEventBus,
       txTheKingKnexConnection,
