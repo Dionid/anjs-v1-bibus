@@ -27,6 +27,7 @@ export type CreatePaymentSuccededEvent = Event<
   "CreatePaymentSucceded",
   {
     paymentId: PaymentId;
+    userId: UserId;
   },
   "v1"
 >;
@@ -71,21 +72,10 @@ export const createPaymentCommandHandlerC =
 
     // ASYNC COMMUNICATION
     await eventBus.publish([
-      {
-        name: "CreatePaymentSucceded",
-        data: {
-          paymentId: payment.id,
-        },
-        meta: {
-          id: v4(),
-          version: "v1",
-          transactionId: command.meta.transactionId,
-          userId: command.meta.userId,
-        },
-      },
       CreatePaymentSuccededEvent.new(
         {
           paymentId: payment.id,
+          userId: payment.userId,
         },
         {
           id: v4(),

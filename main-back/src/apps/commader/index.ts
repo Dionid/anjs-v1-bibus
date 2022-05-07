@@ -47,6 +47,9 @@ const main = async () => {
     eventBusInMemory
   );
 
+  // // . ORCHESTRATOR
+  // initOrchestrator(logger, eventBusInMemory, theKingKnexConnection);
+
   // . HTTP
   const fastifyApp = initFastifyApp(
     config,
